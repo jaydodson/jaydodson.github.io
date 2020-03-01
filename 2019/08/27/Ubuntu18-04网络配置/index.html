@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>Ubuntu18.04网络配置 | Jay&#39;s blog</title>
+  <meta name="description" content="根据以往配置Ubuntu静态ip的经验，直接 vi &#x2F;etc&#x2F;network&#x2F;interfaces 在该文件下配置了静态ip，重置网络后发现并没有生效.百度，发现“ubuntu从17.10开始，已放弃在&#x2F;etc&#x2F;network&#x2F;interfaces里固定IP的配置，即使配置也不会生效，而是改成netplan方式 ，配置写在&#x2F;etc&#x2F;netplan&#x2F;*.yaml文件里”，所以根据查到的方法进行配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ubuntu18.04网络配置">
+<meta property="og:url" content="http://www.jaydodson.top/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/index.html">
+<meta property="og:site_name" content="Jay&#39;s blog">
+<meta property="og:description" content="根据以往配置Ubuntu静态ip的经验，直接 vi &#x2F;etc&#x2F;network&#x2F;interfaces 在该文件下配置了静态ip，重置网络后发现并没有生效.百度，发现“ubuntu从17.10开始，已放弃在&#x2F;etc&#x2F;network&#x2F;interfaces里固定IP的配置，即使配置也不会生效，而是改成netplan方式 ，配置写在&#x2F;etc&#x2F;netplan&#x2F;*.yaml文件里”，所以根据查到的方法进行配置">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://www.jaydodson.top/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/netplan_1.png">
+<meta property="og:image" content="http://www.jaydodson.top/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/netplan_2.png">
+<meta property="og:image" content="http://www.jaydodson.top/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/netplan_3.png">
+<meta property="og:image" content="http://www.jaydodson.top/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/netplan_4.png">
+<meta property="article:published_time" content="2019-08-27T09:26:57.000Z">
+<meta property="article:modified_time" content="2020-02-28T12:16:11.558Z">
+<meta property="article:author" content="Jay Dodson">
+<meta property="article:tag" content="Ubuntu">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.jaydodson.top/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/netplan_1.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://www.jaydodson.top/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Jay&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favi.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/jaydodson" target="_blank">
+          <img class="img-circle img-rotate" src="/images/THE1.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">m0s</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">信安之路。</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Hangzhou, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books">
+            
+            <i class="icon icon-book-fill"></i>
+            
+            <span class="menu-title">书单</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/jaydodson" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Ubuntu/">Ubuntu</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BF%A1%E5%AE%89%E4%B9%8B%E8%B7%AF/">信安之路</a><span class="category-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ubuntu/" rel="tag">Ubuntu</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/" rel="tag">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php-fpm/" rel="tag">php-fpm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/" rel="tag">sql</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql%E6%B3%A8%E5%85%A5/" rel="tag">sql注入</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Ubuntu/" style="font-size: 13.33px;">Ubuntu</a> <a href="/tags/mysql/" style="font-size: 14px;">mysql</a> <a href="/tags/nginx/" style="font-size: 13px;">nginx</a> <a href="/tags/php-fpm/" style="font-size: 13px;">php-fpm</a> <a href="/tags/sql/" style="font-size: 13.67px;">sql</a> <a href="/tags/sql%E6%B3%A8%E5%85%A5/" style="font-size: 13px;">sql注入</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BF%A1%E5%AE%89%E4%B9%8B%E8%B7%AF/">信安之路</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/09/29/WEB%E9%A1%B5%E9%9D%A2%E8%A7%A3%E6%9E%90%E7%9A%84%E6%B5%81%E7%A8%8B%E5%AD%A6%E4%B9%A0/" class="title">第九周，WEB页面解析的流程学习</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-09-29T05:43:43.000Z" itemprop="datePublished">2019-09-29</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BF%A1%E5%AE%89%E4%B9%8B%E8%B7%AF/">信安之路</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/" class="title">第六周，数据库相关注入语句的收集和学习</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-09-08T04:43:43.000Z" itemprop="datePublished">2019-09-08</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Ubuntu/">Ubuntu</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/" class="title">Ubuntu18.04网络配置</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-08-27T09:26:57.000Z" itemprop="datePublished">2019-08-27</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Ubuntu/">Ubuntu</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/08/27/Ubuntu18-04%E6%96%B0%E7%89%B9%E6%80%A7%E6%80%BB%E7%BB%93/" class="title">Ubuntu18.04新特性总结</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-08-27T09:17:19.000Z" itemprop="datePublished">2019-08-27</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BF%A1%E5%AE%89%E4%B9%8B%E8%B7%AF/">信安之路</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/08/25/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/" class="title">第四周，数据库系统功能相关学习</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-08-25T11:33:51.000Z" itemprop="datePublished">2019-08-25</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<aside class="sidebar sidebar-toc collapse" id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Ubuntu18-04网络配置" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Ubuntu18.04网络配置
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/" class="article-date">
+	  <time datetime="2019-08-27T09:26:57.000Z" itemprop="datePublished">2019-08-27</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/Ubuntu/">Ubuntu</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/Ubuntu/" rel="tag">Ubuntu</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <blockquote>
+<p>根据以往配置Ubuntu静态ip的经验，直接 vi /etc/network/interfaces 在该文件下配置了静态ip，重置网络后发现并没有生效.百度，发现“ubuntu从17.10开始，已放弃在/etc/network/interfaces里固定IP的配置，即使配置也不会生效，而是改成netplan方式 ，配置写在/etc/netplan/*.yaml文件里”，所以根据查到的方法进行配置，结果遇到好多报错，这里记录下曾经的坑。<br><img src="/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/netplan_1.png" alt></p>
+</blockquote>
+<p><code>netplan apply #配置完之后使用此命令使配置生效</code></p>
+<p><img src="/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/netplan_2.png" alt></p>
+<ul>
+<li>注意点：</li>
+</ul>
+<ol>
+<li>注意缩进</li>
+<li>网关的ip地址不需要[ ]包裹</li>
+<li>gateway4和附属addresses缩进经常遗漏</li>
+<li>: 后面一定要有个空格，不然会 注意报错(单词会变颜色)</li>
+</ol>
+<p><code>/etc/resolv.conf  #DNS的配置文件没有变</code></p>
+<p><img src="/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/netplan_3.png" alt></p>
+<blockquote>
+<p>桥接：</p>
+<blockquote>
+<p>物理网卡要设置成没有IP,注意缩进，其他基本与之前相同<br><img src="/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/netplan_4.png" alt></p>
+</blockquote>
+</blockquote>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://www.jaydodson.top/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/" title="Ubuntu18.04网络配置" target="_blank" rel="external">http://www.jaydodson.top/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/jaydodson" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/THE1.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/jaydodson" target="_blank"><span class="text-dark">m0s</span><small class="ml-1x">信安之路。</small></a></h3>
+        <div>我也不知道说啥。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="lv-container" data-id="city" data-uid="MTAyMC80NjIyNi8yMjczNw==">
+        <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+      </div>    
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/" title="第六周，数据库相关注入语句的收集和学习"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2019/08/27/Ubuntu18-04%E6%96%B0%E7%89%B9%E6%80%A7%E6%80%BB%E7%BB%93/" title="Ubuntu18.04新特性总结"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn collapsed" data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">
+        <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,wechat,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/jaydodson" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        &copy; 2020 Jay Dodson
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+<script defer type="text/javascript">
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+
+    if (typeof LivereTower === 'function') { return; }
+
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+</script>
+
+
+
+
+
+
+
+
+</body>
+</html>

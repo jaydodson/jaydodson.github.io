@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>第三周，数据库系统表相关学习 | Jay&#39;s blog</title>
+  <meta name="description" content="MySQL读取文件相关：MySQL读取文件的方法大致有三种： load_file() load data infile() system catload_file()和load data infile读取文件的方法为:新建一个表，读取文件为字符串形式插入表中，然后读出表中数据。  但是通常情况下有两个前提: 在拥有file权限的前提下 secure_file_priv不为NULL 这里要说secu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第三周，数据库系统表相关学习">
+<meta property="og:url" content="http://www.jaydodson.top/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Jay&#39;s blog">
+<meta property="og:description" content="MySQL读取文件相关：MySQL读取文件的方法大致有三种： load_file() load data infile() system catload_file()和load data infile读取文件的方法为:新建一个表，读取文件为字符串形式插入表中，然后读出表中数据。  但是通常情况下有两个前提: 在拥有file权限的前提下 secure_file_priv不为NULL 这里要说secu">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://www.jaydodson.top/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/3-1.png">
+<meta property="og:image" content="http://www.jaydodson.top/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/3-2.png">
+<meta property="og:image" content="http://www.jaydodson.top/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/3-3.png">
+<meta property="og:image" content="http://www.jaydodson.top/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/3-4.png">
+<meta property="og:image" content="http://www.jaydodson.top/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/3-5.png">
+<meta property="og:image" content="http://www.jaydodson.top/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/3-6.png">
+<meta property="og:image" content="http://www.jaydodson.top/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/3-7.png">
+<meta property="og:image" content="http://www.jaydodson.top/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/3-8.png">
+<meta property="og:image" content="http://www.jaydodson.top/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/3-9.png">
+<meta property="article:published_time" content="2019-08-18T11:15:52.000Z">
+<meta property="article:modified_time" content="2020-02-28T12:13:59.210Z">
+<meta property="article:author" content="Jay Dodson">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="sql">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.jaydodson.top/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/3-1.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://www.jaydodson.top/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Jay&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favi.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/jaydodson" target="_blank">
+          <img class="img-circle img-rotate" src="/images/THE1.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">m0s</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">信安之路。</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Hangzhou, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books">
+            
+            <i class="icon icon-book-fill"></i>
+            
+            <span class="menu-title">书单</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/jaydodson" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Ubuntu/">Ubuntu</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BF%A1%E5%AE%89%E4%B9%8B%E8%B7%AF/">信安之路</a><span class="category-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ubuntu/" rel="tag">Ubuntu</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/" rel="tag">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php-fpm/" rel="tag">php-fpm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/" rel="tag">sql</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql%E6%B3%A8%E5%85%A5/" rel="tag">sql注入</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Ubuntu/" style="font-size: 13.33px;">Ubuntu</a> <a href="/tags/mysql/" style="font-size: 14px;">mysql</a> <a href="/tags/nginx/" style="font-size: 13px;">nginx</a> <a href="/tags/php-fpm/" style="font-size: 13px;">php-fpm</a> <a href="/tags/sql/" style="font-size: 13.67px;">sql</a> <a href="/tags/sql%E6%B3%A8%E5%85%A5/" style="font-size: 13px;">sql注入</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BF%A1%E5%AE%89%E4%B9%8B%E8%B7%AF/">信安之路</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/09/29/WEB%E9%A1%B5%E9%9D%A2%E8%A7%A3%E6%9E%90%E7%9A%84%E6%B5%81%E7%A8%8B%E5%AD%A6%E4%B9%A0/" class="title">第九周，WEB页面解析的流程学习</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-09-29T05:43:43.000Z" itemprop="datePublished">2019-09-29</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BF%A1%E5%AE%89%E4%B9%8B%E8%B7%AF/">信安之路</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/" class="title">第六周，数据库相关注入语句的收集和学习</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-09-08T04:43:43.000Z" itemprop="datePublished">2019-09-08</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Ubuntu/">Ubuntu</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/" class="title">Ubuntu18.04网络配置</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-08-27T09:26:57.000Z" itemprop="datePublished">2019-08-27</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Ubuntu/">Ubuntu</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/08/27/Ubuntu18-04%E6%96%B0%E7%89%B9%E6%80%A7%E6%80%BB%E7%BB%93/" class="title">Ubuntu18.04新特性总结</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-08-27T09:17:19.000Z" itemprop="datePublished">2019-08-27</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BF%A1%E5%AE%89%E4%B9%8B%E8%B7%AF/">信安之路</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/08/25/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/" class="title">第四周，数据库系统功能相关学习</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-08-25T11:33:51.000Z" itemprop="datePublished">2019-08-25</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<aside class="sidebar sidebar-toc collapse" id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#MySQL读取文件相关："><span class="toc-number">1.</span> <span class="toc-text">MySQL读取文件相关：</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#MySQL读取文件的方法大致有三种："><span class="toc-number">1.1.</span> <span class="toc-text">MySQL读取文件的方法大致有三种：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#但是通常情况下有两个前提"><span class="toc-number">1.2.</span> <span class="toc-text">但是通常情况下有两个前提:</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#MySQL系统表相关"><span class="toc-number">2.</span> <span class="toc-text">MySQL系统表相关</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#其他命令："><span class="toc-number">3.</span> <span class="toc-text">其他命令：</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#hashcat"><span class="toc-number">4.</span> <span class="toc-text">hashcat</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-数据库系统表相关学习" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      第三周，数据库系统表相关学习
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/" class="article-date">
+	  <time datetime="2019-08-18T11:15:52.000Z" itemprop="datePublished">2019-08-18</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E4%BF%A1%E5%AE%89%E4%B9%8B%E8%B7%AF/">信安之路</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/mysql/" rel="tag">mysql</a>, <a class="article-tag-link" href="/tags/sql/" rel="tag">sql</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h1 id="MySQL读取文件相关："><a href="#MySQL读取文件相关：" class="headerlink" title="MySQL读取文件相关："></a>MySQL读取文件相关：</h1><h2 id="MySQL读取文件的方法大致有三种："><a href="#MySQL读取文件的方法大致有三种：" class="headerlink" title="MySQL读取文件的方法大致有三种："></a>MySQL读取文件的方法大致有三种：</h2><ol>
+<li>load_file()</li>
+<li>load data infile()</li>
+<li>system cat<br>load_file()和load data infile读取文件的方法为:新建一个表，读取文件为字符串形式插入表中，然后读出表中数据。</li>
+</ol>
+<h2 id="但是通常情况下有两个前提"><a href="#但是通常情况下有两个前提" class="headerlink" title="但是通常情况下有两个前提:"></a>但是通常情况下有两个前提:</h2><ol>
+<li>在拥有file权限的前提下</li>
+<li>secure_file_priv不为NULL<blockquote>
+<p>这里要说secure-file-priv参数：secure-file-priv参数是用来限制LOAD DATA, SELECT … OUTFILE, and LOAD_FILE()传到哪个指定目录的。</p>
+<blockquote>
+<p>当secure_file_priv的值为null ，表示限制mysqld 不允许导入|导出<br>当secure_file_priv的值为/tmp/ ，表示限制mysqld 的导入|导出只能发生在/tmp/目录下<br>当secure_file_priv的值没有具体值时，表示不对mysqld 的导入|导出做限制</p>
+</blockquote>
+</blockquote>
+</li>
+</ol>
+<p><code>show global variables like &#39;secure_file_priv&#39;; #查看secure-file-priv参数的值</code><br><img src="/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/3-1.png" alt><br>参数值默认是NULL或者是指定路径。这时候可以手动修改。</p>
+<blockquote>
+<p>网上给出的解决方法如下：</p>
+</blockquote>
+<ul>
+<li>windows下：修改my.ini 在[mysqld]内加入secure_file_priv =</li>
+<li>linux下：修改/etc/mysql/my.cnf 在[mysqld]内加入secure_file_priv =</li>
+<li>然后重启mysql，再查询secure_file_priv</li>
+</ul>
+<hr>
+<blockquote>
+<p>而实际操作的时候会发现有的人装了mysql之后并不存在/etc/mysql/my.cnf文件<br>或者说/etc/mysql/my.cnf文件内并没有存放参数。<br>这时候就应该修改/etc/mysql/mysql.conf.d/mysqld.cnf文件。如图：<br><img src="/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/3-2.png" alt><br>这里还有个坑，修改 secure_file_priv = “ “ 之后往数据库插入数据可能依旧是NULL ，改为secure_file_priv = “/“即可。<br>准备完成之后开始试验，首先往/tmp/1.txt和/tmp/2.txt写入数据<br><img src="/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/3-3.png" alt><br><code>create table user(cmd BLOB); #创建一个新表</code><br>这里出现第二个坑：数据类型，网上查到的资料有的会是 create table user(cmd TEXT);<br>TEXT是长文本数据类型，读取文件应该采用的是二进制类型（TINYBLOB/BLOB等）</p>
+</blockquote>
+<p><code>insert into test(va) value(load_file(&#39;/tmp/1.txt&#39;)); #往表中插入文件中的数据。</code><br><img src="/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/3-4.png" alt><br>load data infile和load_file()用法上没有什么区别,只是在注入过程中，往往会过滤掉load_file()这个函数，但是仍然有load data infile可以使用。<br><code>load data infile &#39;/tmp/2.txt&#39; into table test; #读取文件中的数据插入表中</code><br><img src="/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/3-5.png" alt></p>
+<blockquote>
+<p>在mysql版本为5.x时,除了可以使用上两种方法外，还可以使用系统命令直接读取文件<br><img src="/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/3-6.png" alt><br>注意：连接远程的mysql服务器的时候无法读取本地的数据</p>
+</blockquote>
+<h1 id="MySQL系统表相关"><a href="#MySQL系统表相关" class="headerlink" title="MySQL系统表相关"></a>MySQL系统表相关</h1><p>Mysql在创建的时候会自动生成四个表<br><img src="/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/3-7.png" alt><br>我们创建的MySQL用户的信息，其实都保存在名称为“mysql”的database里的名为user 的table中<br><code>select * from mysql.user; 查看用户表中数据</code><br><img src="/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/3-8.png" alt><br>但是排版会比较乱。<br><code>select User,Host,authentication_string from user; #可以使用这条命令查看当前所有MySQL用户的username、host、密码</code></p>
+<blockquote>
+<p>注意MySQL从某个版本开始，密码字段不是password，而是authentication_string<br><img src="/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/3-9.png" alt></p>
+</blockquote>
+<h1 id="其他命令："><a href="#其他命令：" class="headerlink" title="其他命令："></a>其他命令：</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">select version(); #查看数据库的版本</span><br><span class="line">show engines; #查看数据库支持的存储引擎及当前的默认存储引擎</span><br><span class="line">select user(); #查看当前登录数据库的用户名</span><br><span class="line">show grants for user_name; #查看当前登录数据库用户的权限</span><br><span class="line">describe customers; #customers为表名</span><br></pre></td></tr></table></figure>
+
+<h1 id="hashcat"><a href="#hashcat" class="headerlink" title="hashcat"></a>hashcat</h1><ul>
+<li>这东西后面再研究，暂时可以先用cmd5在线查</li>
+</ul>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://www.jaydodson.top/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/" title="第三周，数据库系统表相关学习" target="_blank" rel="external">http://www.jaydodson.top/2019/08/18/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A1%A8%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/jaydodson" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/THE1.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/jaydodson" target="_blank"><span class="text-dark">m0s</span><small class="ml-1x">信安之路。</small></a></h3>
+        <div>我也不知道说啥。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="lv-container" data-id="city" data-uid="MTAyMC80NjIyNi8yMjczNw==">
+        <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+      </div>    
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2019/08/25/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/" title="第四周，数据库系统功能相关学习"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2019/08/10/%E7%AC%AC%E4%BA%8C%E5%91%A8%EF%BC%8CSQL%E7%9A%84%E5%AD%A6%E4%B9%A0/" title="第二周，SQL的学习"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn collapsed" data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">
+        <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,wechat,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/jaydodson" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        &copy; 2020 Jay Dodson
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+<script defer type="text/javascript">
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+
+    if (typeof LivereTower === 'function') { return; }
+
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+</script>
+
+
+
+
+
+
+
+
+</body>
+</html>
