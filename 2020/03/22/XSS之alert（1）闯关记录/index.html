@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>alert(1)闯关记录 | m0s&#39;s blog</title>
+  <meta name="description" content="##0x00  先看下服务器端的代码。可以看到就用了一个标签包裹，没有做任何过滤，随便写入一个标签就好了。   例如：   成功弹出alert(1)时，界面会出现一个大大的YES，挺有趣的。   ##0x01  先看下服务器端的代码。这关也是没有做任何过滤，但是用了一个&lt;textarea&gt;标签进行包裹，在&lt;textarea&gt;标签里面的所有字符都会被看作是普通的字符输入.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="alert(1)闯关记录">
+<meta property="og:url" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/index.html">
+<meta property="og:site_name" content="Jay&#39;s blog">
+<meta property="og:description" content="##0x00  先看下服务器端的代码。可以看到就用了一个标签包裹，没有做任何过滤，随便写入一个标签就好了。   例如：   成功弹出alert(1)时，界面会出现一个大大的YES，挺有趣的。   ##0x01  先看下服务器端的代码。这关也是没有做任何过滤，但是用了一个&lt;textarea&gt;标签进行包裹，在&lt;textarea&gt;标签里面的所有字符都会被看作是普通的字符输入.">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/0-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/0-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/0-4.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/0-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-4.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-5.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/2-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/2-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/2-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/2-4.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/3-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/3-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/3-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/4-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/4-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/4-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/4-4.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/5-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/5-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/5-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/6-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/6-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/6-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/6-4.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/6-5.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/7-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/7-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/7-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/8-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/8-2.png">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/8-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/8-4.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/9-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/9-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/9-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/A-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/B-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/B-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/B-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/C-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/C-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/C-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/C-4.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/D-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/D-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/D-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/D-4.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/D-5.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/E-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/E-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/E-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/F-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/F-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/F-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/10-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/10-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/10-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/11-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/11-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/11-3.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/11-4.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/12-1.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/12-2.jpg">
+<meta property="og:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/12-3.jpg">
+<meta property="article:published_time" content="2020-03-22T09:26:57.000Z">
+<meta property="article:modified_time" content="2020-03-29T09:17:35.955Z">
+<meta property="article:author" content="Jay Dodson">
+<meta property="article:tag" content="xss">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/0-1.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Jay&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favi.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/jaydodson" target="_blank">
+          <img class="img-circle img-rotate" src="/images/THE1.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">m0s</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">信安之路。</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Hangzhou, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books">
+            
+            <i class="icon icon-book-fill"></i>
+            
+            <span class="menu-title">书单</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/jaydodson" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Ubuntu/">Ubuntu</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BF%A1%E5%AE%89%E4%B9%8B%E8%B7%AF/">信安之路</a><span class="category-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ubuntu/" rel="tag">Ubuntu</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/" rel="tag">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php-fpm/" rel="tag">php-fpm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/" rel="tag">sql</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql%E6%B3%A8%E5%85%A5/" rel="tag">sql注入</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xss/" rel="tag">xss</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Ubuntu/" style="font-size: 13.33px;">Ubuntu</a> <a href="/tags/mysql/" style="font-size: 14px;">mysql</a> <a href="/tags/nginx/" style="font-size: 13px;">nginx</a> <a href="/tags/php-fpm/" style="font-size: 13px;">php-fpm</a> <a href="/tags/sql/" style="font-size: 13.67px;">sql</a> <a href="/tags/sql%E6%B3%A8%E5%85%A5/" style="font-size: 13px;">sql注入</a> <a href="/tags/xss/" style="font-size: 13px;">xss</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/" class="title">alert(1)闯关记录</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-03-22T09:26:57.000Z" itemprop="datePublished">2020-03-22</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2020/03/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/" class="title">sqli-labs闯关记录</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-03-01T09:26:57.000Z" itemprop="datePublished">2020-03-01</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BF%A1%E5%AE%89%E4%B9%8B%E8%B7%AF/">信安之路</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/09/29/WEB%E9%A1%B5%E9%9D%A2%E8%A7%A3%E6%9E%90%E7%9A%84%E6%B5%81%E7%A8%8B%E5%AD%A6%E4%B9%A0/" class="title">第九周，WEB页面解析的流程学习</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-09-29T05:43:43.000Z" itemprop="datePublished">2019-09-29</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BF%A1%E5%AE%89%E4%B9%8B%E8%B7%AF/">信安之路</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/09/08/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9B%B8%E5%85%B3%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%94%B6%E9%9B%86%E5%92%8C%E5%AD%A6%E4%B9%A0/" class="title">第六周，数据库相关注入语句的收集和学习</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-09-08T04:43:43.000Z" itemprop="datePublished">2019-09-08</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Ubuntu/">Ubuntu</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/08/27/Ubuntu18-04%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/" class="title">Ubuntu18.04网络配置</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-08-27T09:26:57.000Z" itemprop="datePublished">2019-08-27</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<aside class="sidebar sidebar-toc collapse" id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-XSS之alert（1）闯关记录" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      alert(1)闯关记录
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/" class="article-date">
+	  <time datetime="2020-03-22T09:26:57.000Z" itemprop="datePublished">2020-03-22</time>
+	</a>
+</span>
+        
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/xss/" rel="tag">xss</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>##0x00<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/0-1.jpg" alt></p>
+<blockquote>
+<p>先看下服务器端的代码。<br>可以看到就用了一个<div>标签包裹，没有做任何过滤，随便写入一个标签就好了。</div></p>
+</blockquote>
+<blockquote>
+<p>例如：<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/0-3.jpg" alt><br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/0-4.jpg" alt></p>
+</blockquote>
+<blockquote>
+<p>成功弹出alert(1)时，界面会出现一个大大的YES，挺有趣的。</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/0-2.jpg" alt></p>
+<p>##0x01<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-1.jpg" alt></p>
+<blockquote>
+<p>先看下服务器端的代码。<br>这关也是没有做任何过滤，但是用了一个<code>&lt;textarea&gt;</code>标签进行包裹，在<code>&lt;textarea&gt;</code>标签里面的所有字符都会被看作是普通的字符输入.</p>
+</blockquote>
+<blockquote>
+<p>例如：我们直接写入<code>&lt;script&gt;</code>标签<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-1.jpg" alt><br>会得到下面的结果<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-3.jpg" alt></p>
+</blockquote>
+<blockquote>
+<p>所以我们要逃逸出<code>&lt;textarea&gt;</code>标签，这里只需要闭合前面的<code>&lt;textarea&gt;</code>标签即可</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-4.jpg" alt></p>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/1-5.jpg" alt></p>
+<p>##0x02<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/2-1.jpg" alt></p>
+<blockquote>
+<p>先看下服务器端的代码。<br>这一次的代码被一个input的标签包含在里面了。<br>同样也是没有做任何过滤。</p>
+</blockquote>
+<blockquote>
+<p>就说两个这道题的解题思路吧</p>
+</blockquote>
+<blockquote>
+<p>#####1.**闭合<code>&lt;input&gt;</code>标签,在后面写入构造的标签。<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/2-2.jpg" alt></p>
+</blockquote>
+<blockquote>
+<p>#####2.在<code>&lt;input&gt;</code>标签里面添加一个触发事件<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/2-3.jpg" alt><br>可以像上面这样利用双引号进行闭合，可也以像下面那样直接注释掉后面的字符。<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/2-4.jpg" alt></p>
+</blockquote>
+<blockquote>
+<p>然后就过关了。</p>
+</blockquote>
+<p>##0x03<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/3-1.jpg" alt></p>
+<blockquote>
+<p>先看下服务器端的代码。<br>这题过滤了<code>()</code>，也就是弹框代码<code>alert(1)</code>中的<code>()</code>是不能使用的了<br>这里有个需要关注的点<code>()</code>不能使用之后我们可以使用``来代替双括号。</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/3-2.jpg" alt></p>
+<blockquote>
+<p>同样是可以进行弹窗的。</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/3-3.jpg" alt></p>
+<p>##0x04<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/4-1.jpg" alt></p>
+<blockquote>
+<p>先看下服务器端的代码，紧接着上一题，这题直接把反引号给过滤了，这里还有办法，那就是使用HTML实体字符。</p>
+</blockquote>
+<blockquote>
+<p>这里绕过的方法也有很多，就例举两个。<br>#####1.使用<code>&lt;svg&gt;</code>标签<br>因为<code>&lt;svg&gt;</code>标签可以直接使用实体字符。<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/4-2.jpg" alt><br>#####2使用JavaScript代码<br>在JavaScript代码中也可以直接使用实体字符。<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/4-3.jpg" alt></p>
+</blockquote>
+<blockquote>
+<p>其中标签的构造多种多样，可自行想象。</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/4-4.jpg" alt></p>
+<p>##0x05<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/5-1.jpg" alt></p>
+<blockquote>
+<p>先看下服务器端的代码。这一题是转译了右注释的符号<code>--&gt;</code>，并且把输入文本放进了多行注释当中。</p>
+</blockquote>
+<blockquote>
+<p>这里也是有一个知识点：HTML中注释可以是左右对称即可，也就是左边的注释符用<code>&lt;!--</code>的时候右边的注释闭合可以用<code>--!&gt;</code>而不一定要用<code>--&gt;</code></p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/5-2.jpg" alt></p>
+<blockquote>
+<p>如下图，依旧是可以成功绕过的。<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/5-3.jpg" alt></p>
+</blockquote>
+<p>##0x06<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/6-1.jpg" alt></p>
+<blockquote>
+<p>先看下服务器端的代码。<br>这一次是过滤了<code>on</code>开头<code>=</code>结尾的字符、<code>&gt;</code>字符，<br>如下图：<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/6-2.jpg" alt></p>
+</blockquote>
+<blockquote>
+<p>这里有两个知识点：</p>
+</blockquote>
+<blockquote>
+<p>1.这种过滤通常可以使用换行去解决<br>2.标签里面先声明一个type的时候第二个type会失效</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/6-3.jpg" alt></p>
+<blockquote>
+<p>也可以不使用type的特性，使用别的触发事件去绕过</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/6-4.jpg" alt></p>
+<blockquote>
+<p>也是可以成功绕过的。</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/6-5.jpg" alt></p>
+<p>##0x07<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/7-1.jpg" alt></p>
+<blockquote>
+<p>先看下服务器端的代码。这一题过滤了以<code>&gt;</code>结尾的字符，然后放入了<code>&lt;article&gt;</code>标签中，那这样绕过就很简单了。</p>
+</blockquote>
+<blockquote>
+<p>这里有个知识点：在html中标签可以不使用<code>&gt;</code>来闭合的，在<code>&lt;article&gt;</code>标签中我们可以使用<code>&lt;svg&gt;</code>标签或者<code>&lt;body&gt;</code>标签</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/7-2.jpg" alt></p>
+<blockquote>
+<p>or</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/7-3.jpg" alt></p>
+<blockquote>
+<p>同样都是能绕过该题的过滤的。</p>
+</blockquote>
+<p>##0x08<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/8-1.jpg" alt></p>
+<blockquote>
+<p>先看下服务器端的代码。<br>这一次是将用户输入的字符放进<code>&lt;style&gt;</code>标签中，但是在放入之前过滤了<code>&lt;/style&gt;</code>，也就是阻止了我们闭合前面的<code>&lt;style&gt;</code>标签。<br>如下图：<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/8-2.png" alt></p>
+</blockquote>
+<blockquote>
+<p>还记得我们在之前讲到的一个知识点吗？这里我们同样可以使用换行操作来绕过过滤。</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/8-3.jpg" alt></p>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/8-4.jpg" alt></p>
+<p>##0x09<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/9-1.jpg" alt></p>
+<blockquote>
+<p>先看下服务器端的代码。这一题输入内容必须以<code>https://www.segmentfault.com</code>开头，否则无法输入数据，接着又将数据插入<code>&lt;script&gt;</code>标签当中。并没有做其他的任何过滤。</p>
+</blockquote>
+<blockquote>
+<p>那么我们其实可以闭合前面的<code>&lt;script&gt;</code>标签，然后和后面的<code>&lt;/script&gt;</code>标签构造语句。</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/9-2.jpg" alt></p>
+<blockquote>
+<p>就能成功过掉过滤。</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/9-3.jpg" alt></p>
+<p>##0x0A<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/A-1.jpg" alt></p>
+<blockquote>
+<p>先看下服务器端的代码。</p>
+</blockquote>
+<p>##0x0B<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/B-1.jpg" alt></p>
+<blockquote>
+<p>先看下服务器端的代码。这题，是将所有的输入都转化成了大写字母，然后在插入进<code>&lt;h1&gt;</code>标签中。</p>
+<p>这里有两个注意点：</p>
+</blockquote>
+<ul>
+<li>html标签大小写无影响。</li>
+<li>js严格区分大小写。</li>
+</ul>
+<blockquote>
+<p>所以既可以使用HTML标签的实体字符，也可以使用外部js代码。<br>这里就只放使用HTML标签的实体字符的情况。</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/B-2.jpg" alt></p>
+<blockquote>
+<p>这里的实体字符是<code>alert(1)</code></p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/B-3.jpg" alt></p>
+<p>##0x0C<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/C-1.jpg" alt></p>
+<blockquote>
+<p>先看下服务器端的代码。这题其实和上题差不多，也是将所有输入全部转化为大写字母然后放入<code>&lt;h1&gt;</code>标签中，只不过多了一个过滤<code>script</code>字符串，那么我可以换一个<code>&lt;img&gt;</code>标签使用，也是使用实体字符绕过的方式。<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/C-2.jpg" alt><br>同时，这里只过滤了一个<code>script</code>字符串，我们也可以通过双写绕过<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/C-3.jpg" alt></p>
+</blockquote>
+<blockquote>
+<p>两种方法都是可以的<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/C-4.jpg" alt></p>
+</blockquote>
+<p>##0x0D<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/D-1.jpg" alt></p>
+<blockquote>
+<p>先看下服务器端的代码。这题过滤了好多符号，</p>
+<p>如下图：</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/D-2.jpg" alt></p>
+<blockquote>
+<p>并且已经为我们够造好了<code>&lt;script&gt;</code>标签和<code>alert()</code>。</p>
+<p>缺少<code>&lt;</code>，不能对前面的标签进行闭合，那么就只能从内容进行入手，<br>输入的地方在注释符<code>//</code>的后面，但是我们可以注意到这个<code>//</code>注释符是单行的，我们可以通过换行来进行绕过</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/D-3.jpg" alt></p>
+<blockquote>
+<p>绕过注释符之后，只留下了<code>&#39;)</code>可以使用html注释<code>--&gt;</code>绕过。</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/D-4.jpg" alt></p>
+<blockquote>
+<p>我们自己再构造一个<code>alert(1)</code>弹窗就可以了。</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/D-5.jpg" alt></p>
+<p>##0x0E<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/E-1.jpg" alt></p>
+<blockquote>
+<p>先看下服务器端的代码。这题先是将所有以<code>&lt;</code>开头的字符无论大小写都转译成<code>&lt;_</code>开头，那么也就是我们什么标签都使用不了了。然后将所有的输入都转化成大写，最后将输入插入到<code>&lt;h1&gt;</code>标签中。</p>
+</blockquote>
+<blockquote>
+<p>乍一看，好像什么办法都没有了，然后找了找资料，发现字符ſ大写后为S（ſ不等于s），哎…那么我们就可以继续注入了，使用0x0B的payload即可。</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/E-2.jpg" alt></p>
+<blockquote>
+<p>应该还有其他字符是可以的，但是没有找到相关资料，就先用这个凑活凑活吧。<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/E-3.jpg" alt></p>
+</blockquote>
+<p>##0x0F<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/F-1.jpg" alt></p>
+<blockquote>
+<p>先看下服务器端的代码。这题是将一些符号过滤成实体字符，不过没有影响 啊，实体字符在HTML标签中照样是可以直接使用的，我们直接够着语句就行了。<br>看下语句，这里是在<code>&lt;img&gt;</code>标签中还给了src和onerror,那直接闭合前面的语句，然后建立自己的alert(1)语句，注释掉后面的东西不就好了么。</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/F-2.jpg" alt></p>
+<blockquote>
+<p>看着有难度其实没有难度。</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/F-3.jpg" alt></p>
+<p>##0x10<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/10-1.jpg" alt></p>
+<blockquote>
+<p>先看下服务器端的代码。直接<code>alert(1)</code>，不说了。</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/10-2.jpg" alt></p>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/10-3.jpg" alt></p>
+<p>##0x11<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/11-1.jpg" alt></p>
+<blockquote>
+<p>先看下服务器端的代码。这次过滤的是真的狠啊..基本上都过滤了，就连<code>\n</code>都被过滤了。</p>
+</blockquote>
+<blockquote>
+<p>但是仔细看，我们的输入点在JavaScript后面的参数，我们需要考虑的是如何闭合，首先，闭合前面我们需要一个使用双引号和右括号<code>&quot;)</code></p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/11-2.jpg" alt></p>
+<blockquote>
+<p><code>&quot;</code>被过滤成了<code>\&quot;</code>，其实没有影响，反斜杠被包裹在了两个双引号之间，失效了。</p>
+</blockquote>
+<blockquote>
+<p>接着我们要考虑如何注释掉后面的字符，通常来讲使用的是<code>//</code>,被转译成了<code>\/\/</code></p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/11-3.jpg" alt></p>
+<blockquote>
+<p>然而，好像没有什么关系。</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/11-4.jpg" alt></p>
+<p>##0x12<br><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/12-1.jpg" alt></p>
+<blockquote>
+<p>先看下服务器端的代码。过滤了双引号，过滤成<code>\&quot;</code>，这不就和上题一样吗..两个双引号直接将<code>\</code>包裹起来了，没有任何影响。</p>
+</blockquote>
+<blockquote>
+<p>然后是将输入数据插入到<code>&lt;script&gt;</code>标签里面..这只需要考虑闭合的问题就好了。</p>
+</blockquote>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/12-2.jpg" alt></p>
+<p><img src="/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/12-3.jpg" alt></p>
+<p>#完事</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/" title="alert(1)闯关记录" target="_blank" rel="external">http://www.jaydodson.top/2020/03/22/XSS%E4%B9%8Balert%EF%BC%881%EF%BC%89%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/jaydodson" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/THE1.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/jaydodson" target="_blank"><span class="text-dark">m0s</span><small class="ml-1x">信安之路。</small></a></h3>
+        <div>我也不知道说啥。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="lv-container" data-id="city" data-uid="MTAyMC80NjIyNi8yMjczNw==">
+        <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+      </div>    
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    
+    <li class="next">
+      <a href="/2020/03/01/sqli-labs%E9%97%AF%E5%85%B3%E8%AE%B0%E5%BD%95/" title="sqli-labs闯关记录"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn collapsed" data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">
+        <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,wechat,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/jaydodson" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        &copy; 2020 Jay Dodson
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+<script defer type="text/javascript">
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+
+    if (typeof LivereTower === 'function') { return; }
+
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+</script>
+
+
+
+
+
+
+
+
+</body>
+</html>
